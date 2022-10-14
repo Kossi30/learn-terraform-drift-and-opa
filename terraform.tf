@@ -1,9 +1,11 @@
 terraform {
   cloud {
+    organization = "Terraformtraining30"
     workspaces {
       name = "learn-terraform-drift-and-opa"
     }
   }
+  
 
   required_providers {
     aws = {
@@ -12,5 +14,5 @@ terraform {
     }
   }
 
-  required_version = "~> 1.3.0"
+  
 }

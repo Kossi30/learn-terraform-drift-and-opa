@@ -30,7 +30,7 @@ resource "aws_security_group" "bastion" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["192.80.0.0/16"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -39,6 +39,9 @@ resource "aws_security_group" "bastion" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+data "aws_ec2_instance_type" "bastion" {
+  instance_type = var.bastion_instance_type
 }
 
 data "aws_ami" "amazon_linux" {
@@ -57,4 +60,11 @@ resource "aws_instance" "bastion" {
 
   subnet_id              = module.vpc.public_subnets[0]
   vpc_security_group_ids = [aws_security_group.bastion.id]
+  lifecycle {
+    precondition {
+      condition     = data.aws_ec2_instance_type.bastion.default_cores <= 2
+      error_message = "Change the value of bastion_instance_type to a type that has 2 or fewer cores to avoid over provisioning."
+    }
+  }
+
 }
